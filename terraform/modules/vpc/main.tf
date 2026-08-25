@@ -3,7 +3,7 @@
 # ====================================================================
 
 provider "aws" {
-    region = var.aws_region
+  region = var.aws_region
 }
 
 resource "aws_vpc" "main_vpc" {
@@ -12,7 +12,7 @@ resource "aws_vpc" "main_vpc" {
   enable_dns_support   = true
 
   tags = {
-    Name = "${var.environment}-vpc"
+    Name        = "${var.environment}-vpc"
     environment = var.environment
   }
 }
@@ -22,52 +22,52 @@ resource "aws_vpc" "main_vpc" {
 # ====================================================================
 
 resource "aws_subnet" "public_subnet_1" {
-    vpc_id = aws_vpc.main_vpc.id
-    cidr_block = var.public_subnet_cidr_block[0]
-    availability_zone = var.public_subnet_az[0]
-    map_public_ip_on_launch = true
-    
-    tags = {
-        Name = "${var.environment}-public-subnet-1"
-        environment = var.environment
-    }
+  vpc_id                  = aws_vpc.main_vpc.id
+  cidr_block              = var.public_subnet_cidr_block[0]
+  availability_zone       = var.public_subnet_az[0]
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name        = "${var.environment}-public-subnet-1"
+    environment = var.environment
+  }
 }
 
 resource "aws_subnet" "public_subnet_2" {
-  vpc_id = aws_vpc.main_vpc.id
-  cidr_block = var.public_subnet_cidr_block[1]
-  availability_zone = var.public_subnet_az[1]
+  vpc_id                  = aws_vpc.main_vpc.id
+  cidr_block              = var.public_subnet_cidr_block[1]
+  availability_zone       = var.public_subnet_az[1]
   map_public_ip_on_launch = true
-  
+
   tags = {
-      Name = "${var.environment}-public-subnet-2"
-      environment = var.environment
+    Name        = "${var.environment}-public-subnet-2"
+    environment = var.environment
   }
 }
 
 # ====================================================================
 # 3. Create Private Subnets
 # ====================================================================
-  
+
 resource "aws_subnet" "private_subnet_1" {
-  vpc_id = aws_vpc.main_vpc.id
-  cidr_block = var.private_subnet_cidr_block[0]
+  vpc_id            = aws_vpc.main_vpc.id
+  cidr_block        = var.private_subnet_cidr_block[0]
   availability_zone = var.private_subnet_az[0]
-  
+
   tags = {
-      Name = "${var.environment}-private-subnet-1"
-      environment = var.environment
+    Name        = "${var.environment}-private-subnet-1"
+    environment = var.environment
   }
 }
 
 resource "aws_subnet" "private_subnet_2" {
-  vpc_id = aws_vpc.main_vpc.id
-  cidr_block = var.private_subnet_cidr_block[1]
+  vpc_id            = aws_vpc.main_vpc.id
+  cidr_block        = var.private_subnet_cidr_block[1]
   availability_zone = var.private_subnet_az[1]
-  
+
   tags = {
-      Name = "${var.environment}-private-subnet-2"
-      environment = var.environment
+    Name        = "${var.environment}-private-subnet-2"
+    environment = var.environment
   }
 }
 
@@ -77,10 +77,10 @@ resource "aws_subnet" "private_subnet_2" {
 
 resource "aws_internet_gateway" "main_igw" {
   vpc_id = aws_vpc.main_vpc.id
-  
+
   tags = {
-      Name = "${var.environment}-igw"
-      environment = var.environment
+    Name        = "${var.environment}-igw"
+    environment = var.environment
   }
 }
 
@@ -95,10 +95,10 @@ resource "aws_route_table" "public_rt" {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.main_igw.id
   }
-  
+
   tags = {
-      Name = "${var.environment}-public-rt"
-      environment = var.environment
+    Name        = "${var.environment}-public-rt"
+    environment = var.environment
   }
 }
 
@@ -110,13 +110,13 @@ resource "aws_route_table" "private_rt" {
   vpc_id = aws_vpc.main_vpc.id
 
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.main_nat.id
-  } 
-  
+  }
+
   tags = {
-      Name = "${var.environment}-private-rt"
-      environment = var.environment
+    Name        = "${var.environment}-private-rt"
+    environment = var.environment
   }
 }
 
@@ -125,13 +125,13 @@ resource "aws_route_table" "private_rt" {
 # ====================================================================
 
 resource "aws_route_table_association" "public_rt_1" {
-    subnet_id = aws_subnet.public_subnet_1.id
-    route_table_id = aws_route_table.public_rt.id
+  subnet_id      = aws_subnet.public_subnet_1.id
+  route_table_id = aws_route_table.public_rt.id
 }
 
 resource "aws_route_table_association" "public_rt_2" {
-    subnet_id = aws_subnet.public_subnet_2.id
-    route_table_id = aws_route_table.public_rt.id
+  subnet_id      = aws_subnet.public_subnet_2.id
+  route_table_id = aws_route_table.public_rt.id
 }
 
 # ====================================================================
@@ -139,13 +139,13 @@ resource "aws_route_table_association" "public_rt_2" {
 # ====================================================================
 
 resource "aws_route_table_association" "private_rt_1" {
-    subnet_id = aws_subnet.private_subnet_1.id
-    route_table_id = aws_route_table.private_rt.id
+  subnet_id      = aws_subnet.private_subnet_1.id
+  route_table_id = aws_route_table.private_rt.id
 }
 
 resource "aws_route_table_association" "private_rt_2" {
-    subnet_id = aws_subnet.private_subnet_2.id
-    route_table_id = aws_route_table.private_rt.id
+  subnet_id      = aws_subnet.private_subnet_2.id
+  route_table_id = aws_route_table.private_rt.id
 }
 
 # ====================================================================
@@ -153,12 +153,12 @@ resource "aws_route_table_association" "private_rt_2" {
 # ====================================================================
 
 resource "aws_eip" "nat" {
-    domain = "vpc"
-    
-    tags = {
-        Name = "${var.environment}-nat-eip"
-        environment = var.environment
-    }
+  domain = "vpc"
+
+  tags = {
+    Name        = "${var.environment}-nat-eip"
+    environment = var.environment
+  }
 }
 
 # ====================================================================
@@ -166,13 +166,13 @@ resource "aws_eip" "nat" {
 # ====================================================================
 
 resource "aws_nat_gateway" "main_gw" {
-    allocation_id = aws_eip.nat.id
-    subnet_id = aws_subnet.public_subnet_1.id
-    
-    tags = {
-        Name = "${var.environment}-nat-gw"
-        environment = var.environment
-    }
+  allocation_id = aws_eip.nat.id
+  subnet_id     = aws_subnet.public_subnet_1.id
 
-    depends_on = [aws_internet_gateway.main_igw]
+  tags = {
+    Name        = "${var.environment}-nat-gw"
+    environment = var.environment
+  }
+
+  depends_on = [aws_internet_gateway.main_igw]
 }
