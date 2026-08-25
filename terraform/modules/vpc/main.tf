@@ -3,17 +3,17 @@
 # ====================================================================
 
 provider "aws" {
-    region = "us-east-1"
+    region = var.aws_region
 }
 
 resource "aws_vpc" "main_vpc" {
-  cidr_block           = "10.0.0.0/16"
+  cidr_block           = var.main_vpc_cidr_block
   enable_dns_hostnames = true
   enable_dns_support   = true
 
   tags = {
-    Name = "dev-vpc"
-    environment = "dev"
+    Name = "${var.environment}-vpc"
+    environment = var.environment
   }
 }
 
@@ -23,25 +23,25 @@ resource "aws_vpc" "main_vpc" {
 
 resource "aws_subnet" "public_subnet_1" {
     vpc_id = aws_vpc.main_vpc.id
-    cidr_block = "10.0.1.0/24"
-    availability_zone = "us-east-1a"
+    cidr_block = var.public_subnet_cidr_block[0]
+    availability_zone = var.public_subnet_az[0]
     map_public_ip_on_launch = true
     
     tags = {
-        Name = "dev-public-subnet-1"
-        environment = "dev"
+        Name = "${var.environment}-public-subnet-1"
+        environment = var.environment
     }
 }
 
 resource "aws_subnet" "public_subnet_2" {
   vpc_id = aws_vpc.main_vpc.id
-  cidr_block = "10.0.2.0/24"
-  availability_zone = "us-east-1b"
+  cidr_block = var.public_subnet_cidr_block[1]
+  availability_zone = var.public_subnet_az[1]
   map_public_ip_on_launch = true
   
   tags = {
-      Name = "dev-public-subnet-2"
-      environment = "dev"
+      Name = "${var.environment}-public-subnet-2"
+      environment = var.environment
   }
 }
 
@@ -51,36 +51,36 @@ resource "aws_subnet" "public_subnet_2" {
   
 resource "aws_subnet" "private_subnet_1" {
   vpc_id = aws_vpc.main_vpc.id
-  cidr_block = "10.0.3.0/24"
-  availability_zone = "us-east-1a"
+  cidr_block = var.private_subnet_cidr_block[0]
+  availability_zone = var.private_subnet_az[0]
   
   tags = {
-      Name = "dev-private-subnet-1"
-      environment = "dev"
+      Name = "${var.environment}-private-subnet-1"
+      environment = var.environment
   }
 }
 
 resource "aws_subnet" "private_subnet_2" {
   vpc_id = aws_vpc.main_vpc.id
-  cidr_block = "10.0.4.0/24"
-  availability_zone = "us-east-1b"
+  cidr_block = var.private_subnet_cidr_block[1]
+  availability_zone = var.private_subnet_az[1]
   
   tags = {
-      Name = "dev-private-subnet-2"
-      environment = "dev"
+      Name = "${var.environment}-private-subnet-2"
+      environment = var.environment
   }
 }
 
 # ====================================================================
-# 4. Create Internet Gateway
+# 4. Create Internet Gateway    
 # ====================================================================
 
 resource "aws_internet_gateway" "main_igw" {
   vpc_id = aws_vpc.main_vpc.id
   
   tags = {
-      Name = "dev-igw"
-      environment = "dev"
+      Name = "${var.environment}-igw"
+      environment = var.environment
   }
 }
 
@@ -97,8 +97,8 @@ resource "aws_route_table" "public_rt" {
   }
   
   tags = {
-      Name = "dev-public-rt"
-      environment = "dev"
+      Name = "${var.environment}-public-rt"
+      environment = var.environment
   }
 }
 
@@ -115,8 +115,8 @@ resource "aws_route_table" "private_rt" {
   } 
   
   tags = {
-      Name = "dev-private-rt"
-      environment = "dev"
+      Name = "${var.environment}-private-rt"
+      environment = var.environment
   }
 }
 
@@ -156,8 +156,8 @@ resource "aws_eip" "nat" {
     domain = "vpc"
     
     tags = {
-        Name = "dev-nat-eip"
-        environment = "dev"
+        Name = "${var.environment}-nat-eip"
+        environment = var.environment
     }
 }
 
@@ -170,8 +170,8 @@ resource "aws_nat_gateway" "main_gw" {
     subnet_id = aws_subnet.public_subnet_1.id
     
     tags = {
-        Name = "dev-nat-gw"
-        environment = "dev"
+        Name = "${var.environment}-nat-gw"
+        environment = var.environment
     }
 
     depends_on = [aws_internet_gateway.main_igw]
