@@ -1,7 +1,7 @@
 variable "environment" {
-    description = "The environment (dev, staging, prod)"
-    type        = string
-    default     = "dev"
+  description = "The environment (dev, staging, prod)"
+  type        = string
+  default     = "dev"
 }
 
 variable "cluster_version" {
@@ -36,5 +36,5 @@ variable "node_min_size" {
 variable "node_instance_type" {
   description = "EC2 instance type for EKS node group"
   type        = string
-  default = "t3.medium"
+  default     = "t3.medium"
 }

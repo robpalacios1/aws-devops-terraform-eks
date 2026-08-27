@@ -18,7 +18,7 @@ output "node_group_id" {
   value       = aws_eks_node_group.main.id
 }
 
-output "cluster_oidc_issuer_url"{
+output "cluster_oidc_issuer_url" {
   description = "URL from emisor OIDC of EKS cluster"
   value       = aws_eks_cluster.main.identity[0].oidc[0].issuer
 }

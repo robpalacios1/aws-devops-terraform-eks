@@ -38,22 +38,22 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
 # ====================================================================
 
 resource "aws_eks_cluster" "main" {
-    name = "${var.environment}-eks-cluster"
-    role_arn = aws_iam_role.eks_cluster_role.arn
-    version = var.cluster_version
+  name     = "${var.environment}-eks-cluster"
+  role_arn = aws_iam_role.eks_cluster_role.arn
+  version  = var.cluster_version
 
-    vpc_config {
-        subnet_ids = var.private_subnet_ids
-    }
+  vpc_config {
+    subnet_ids = var.private_subnet_ids
+  }
 
-    depends_on = [
-        aws_iam_role_policy_attachment.eks_cluster_policy
-    ]
+  depends_on = [
+    aws_iam_role_policy_attachment.eks_cluster_policy
+  ]
 
-    tags = {
-        Name        = "${var.environment}-eks-cluster"
-        environment = "${var.environment}"
-    }
+  tags = {
+    Name        = "${var.environment}-eks-cluster"
+    environment = "${var.environment}"
+  }
 }
 
 # ====================================================================
@@ -61,40 +61,40 @@ resource "aws_eks_cluster" "main" {
 # ====================================================================
 
 resource "aws_iam_role" "eks_node_role" {
-    name = "${var.environment}-eks-node-group"
+  name = "${var.environment}-eks-node-group"
 
-    assume_role_policy = jsonencode({
-        "Version" : "2012-10-17"
-        "Statement" : [
-            {
-                "Effect" : "Allow"
-                "Principal" : {
-                    "Service" : "ec2.amazonaws.com"
-                },
-                "Action" : "sts:AssumeRole"
-            }
-        ]
-    })
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17"
+    "Statement" : [
+      {
+        "Effect" : "Allow"
+        "Principal" : {
+          "Service" : "ec2.amazonaws.com"
+        },
+        "Action" : "sts:AssumeRole"
+      }
+    ]
+  })
 
-    tags = {
-        Name        = "${var.environment}-eks-node-group"
-        environment = "${var.environment}"
-    }
+  tags = {
+    Name        = "${var.environment}-eks-node-group"
+    environment = "${var.environment}"
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "eks_worker_node_policy" {
-    role = aws_iam_role.eks_node_role.name
-    policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+  role       = aws_iam_role.eks_node_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
 }
 
 resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
-    role = aws_iam_role.eks_node_role.name
-    policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  role       = aws_iam_role.eks_node_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
 }
 
 resource "aws_iam_role_policy_attachment" "eks_ecr_read_only" {
-    role = aws_iam_role.eks_node_role.name
-    policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  role       = aws_iam_role.eks_node_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
 
 # ====================================================================
@@ -102,30 +102,30 @@ resource "aws_iam_role_policy_attachment" "eks_ecr_read_only" {
 # ====================================================================
 
 resource "aws_eks_node_group" "main" {
-    cluster_name    = aws_eks_cluster.main.name
-    node_group_name = "${var.environment}-node-group"
-    node_role_arn = aws_iam_role.eks_node_role.arn
+  cluster_name    = aws_eks_cluster.main.name
+  node_group_name = "${var.environment}-node-group"
+  node_role_arn   = aws_iam_role.eks_node_role.arn
 
-    subnet_ids      = var.private_subnet_ids
+  subnet_ids = var.private_subnet_ids
 
-    scaling_config {
-        desired_size = 3
-        max_size     = 4
-        min_size     = 2
-    }
+  scaling_config {
+    desired_size = 3
+    max_size     = 4
+    min_size     = 2
+  }
 
-    instance_types = ["t3.medium"]
-    capacity_type = "ON_DEMAND"
-    
-    depends_on = [
-        aws_iam_role_policy_attachment.eks_worker_node_policy,
-        aws_iam_role_policy_attachment.eks_cni_policy,
-        aws_iam_role_policy_attachment.eks_ecr_read_only
-    ]
+  instance_types = ["t3.medium"]
+  capacity_type  = "ON_DEMAND"
 
-    tags = {
-        Name        = "${var.environment}-node-group"
-        environment = "${var.environment}"
-    }
+  depends_on = [
+    aws_iam_role_policy_attachment.eks_worker_node_policy,
+    aws_iam_role_policy_attachment.eks_cni_policy,
+    aws_iam_role_policy_attachment.eks_ecr_read_only
+  ]
+
+  tags = {
+    Name        = "${var.environment}-node-group"
+    environment = "${var.environment}"
+  }
 }
 
