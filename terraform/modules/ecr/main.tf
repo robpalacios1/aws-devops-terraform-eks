@@ -8,29 +8,29 @@ provider "aws" {
 
 resource "aws_ecr_repository" "this" {
 
-    for_each = toset(var.repository_names)
+  for_each = toset(var.repository_names)
 
-    name = "${var.environment}-${each.value}"
-    image_tag_mutability = "IMMUTABLE"
+  name                 = "${var.environment}-${each.value}"
+  image_tag_mutability = "IMMUTABLE"
 
-    image_scanning_configuration {
-      scan_on_push = true
-    }
+  image_scanning_configuration {
+    scan_on_push = true
+  }
 
-    encryption_configuration {
-      encryption_type = "AES256"
-    }
+  encryption_configuration {
+    encryption_type = "AES256"
+  }
 
-    tags = {
-        Name = "${var.environment}-${each.value}"
-        environment = "${var.environment}"
-    }
+  tags = {
+    Name        = "${var.environment}-${each.value}"
+    environment = "${var.environment}"
+  }
 }
 
 resource "aws_ecr_lifecycle_policy" "this" {
 
   for_each = toset(var.repository_names)
-  
+
   repository = aws_ecr_repository.this[each.key].name
 
   policy = jsonencode({
@@ -39,10 +39,10 @@ resource "aws_ecr_lifecycle_policy" "this" {
         rulePriority = 1
         description  = "keep only 10 latest images"
         selection = {
-          tagStatus = "any"
+          tagStatus     = "any"
           tagPrefixList = ["${var.environment}"]
-          countType = "imageCountMoreThan"
-          countNumber = 10
+          countType     = "imageCountMoreThan"
+          countNumber   = 10
         }
         action = {
           type = "expire"
