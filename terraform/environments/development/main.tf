@@ -12,3 +12,8 @@ module "eks" {
   environment        = "dev"
   private_subnet_ids = module.vpc.private_subnet_ids
 }
+
+module "github_oidc" {
+  source      = "../../modules/github-oidc"
+  environment = "dev"
+}
