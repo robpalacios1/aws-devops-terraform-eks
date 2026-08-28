@@ -1,6 +1,7 @@
 # global variables of Infrastructure
 environment: dev
 awsRegion: us-east-1
+accountId: ""
 
 # list of microservices to deploy
 services:
