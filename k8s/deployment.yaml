@@ -1,0 +1,141 @@
+# ====================================================================
+# 1. DEPLOYMENT FOR ORDERS SERVICE
+# ====================================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orders-service
+  namespace: default
+  labels:
+    app: orders-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: orders-service
+  template:
+    metadata:
+      labels:
+        app: orders-service
+    spec:
+      containers:
+        - name: web-app
+          image: 490059499947.dkr.ecr.us-east-1.amazonaws.com/dev-orders-service:latest
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "256m"
+            limits:
+              memory: "128Mi"
+              cpu: "512m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+        
+---
+
+# ====================================================================
+# 2. DEPLOYMENT FOR PRODUCTS SERVICE
+# ====================================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: products-service
+  namespace: default
+  labels:
+    app: products-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: products-service
+  template:
+    metadata:
+      labels:
+        app: products-service
+    spec:
+      containers:
+        - name: web-app
+          image: 490059499947.dkr.ecr.us-east-1.amazonaws.com/dev-products-service:latest
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "256m"
+            limits:
+              memory: "128Mi"
+              cpu: "512m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+        
+---
+
+# ====================================================================
+# 3. DEPLOYMENT FOR USERS SERVICE
+# ====================================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-service
+  namespace: default
+  labels:
+    app: users-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: users-service
+  template:
+    metadata:
+      labels:
+        app: users-service
+    spec:
+      containers:
+        - name: web-app
+          image: 490059499947.dkr.ecr.us-east-1.amazonaws.com/dev-users-service:latest
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "256m"
+            limits:
+              memory: "128Mi"
+              cpu: "512m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
