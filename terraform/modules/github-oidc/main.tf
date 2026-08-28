@@ -6,14 +6,8 @@ provider "aws" {
 # 1. OIDC Provider - AWS trusts GitHub as an identity provider
 # ====================================================================
 
-resource "aws_iam_openid_connect_provider" "github" {
+data "aws_iam_openid_connect_provider" "github" {
   url  = "https://token.actions.githubusercontent.com"
-  client_id_list = [
-    "sts.amazonaws.com"
-  ]
-  thumbprint_list = [
-    "69369f16fe0b00393bbd79944d495b6780a6177c"
-  ]
 }
 
 # ====================================================================
@@ -29,7 +23,7 @@ resource "aws_iam_role" "github_actions" {
             {
                 Effect = "Allow"
                 Principal = {
-                    Federated = aws_iam_openid_connect_provider.github.arn
+                    Federated = data.aws_iam_openid_connect_provider.github.arn
                 }
                 Action = "sts:AssumeRoleWithWebIdentity"
                 Condition = {
