@@ -19,21 +19,21 @@ spec:
     spec:
       containers:
         - name: web-app
-          image: ${{values.accountId}}.dkr.ecr.${{values.awsRegion}}.amazonaws.com/${{values.environment}}-{{$serviceName}}:latest
+          image: "{{ $.Values.accountId }}.dkr.ecr.{{ $.Values.awsRegion }}.amazonaws.com/{{ $.Values.environment }}-{{ $serviceName }}:latest"
           ports:
-            - containerPort: ${{serviceSpec.port}}
+            - containerPort: {{ $serviceSpec.port }}
           resources:
             {{- toYaml $serviceSpec.resources | nindent 12 -}}
           livenessProbe:
             httpGet:
               path: /health
-              port: ${{serviceSpec.port}}
+              port: {{ $serviceSpec.port }}
             initialDelaySeconds: 5
             periodSeconds: 5
           readinessProbe:
             httpGet:
               path: /health
-              port: ${{serviceSpec.port}}
+              port: {{ $serviceSpec.port }}
             initialDelaySeconds: 5
             periodSeconds: 5
 ---
