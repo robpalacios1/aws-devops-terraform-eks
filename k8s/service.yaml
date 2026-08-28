@@ -1,0 +1,63 @@
+# ====================================================================
+# 1. SERVICE FOR ORDERS SERVICE
+# ====================================================================  
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: orders-service
+  namespace: default
+  labels:
+    app: orders-service
+spec:
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  selector:
+    app: orders-service
+
+---
+
+# ====================================================================
+# 2. SERVICE FOR PRODUCTS SERVICE
+# ====================================================================    
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: products-service
+  namespace: default
+  labels:
+    app: products-service
+spec:
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  selector:
+    app: products-service
+
+---
+
+# ====================================================================
+# 3. SERVICE FOR USERS SERVICE
+# ====================================================================    
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: users-service
+  namespace: default
+  labels:
+    app: users-service
+spec:
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  selector:
+    app: users-service
