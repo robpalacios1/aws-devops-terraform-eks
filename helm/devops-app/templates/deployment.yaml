@@ -1,0 +1,41 @@
+{{- range $serviceName, $serviceSpec := .Values.services -}}
+{{- if $serviceSpec.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $serviceName }}-deployment
+  namespace: default
+  labels:
+    app: {{ $serviceName }}
+spec:
+  replicas: {{ $serviceSpec.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ $serviceName }}
+  template:
+    metadata:
+      labels:
+        app: {{ $serviceName }}
+    spec:
+      containers:
+        - name: web-app
+          image: ${{values.accountId}}.dkr.ecr.${{values.awsRegion}}.amazonaws.com/${{values.environment}}-{{$serviceName}}:latest
+          ports:
+            - containerPort: ${{serviceSpec.port}}
+          resources:
+            {{- toYaml $serviceSpec.resources | nindent 12 -}}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: ${{serviceSpec.port}}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: ${{serviceSpec.port}}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+---
+{{- end -}}
+{{- end -}}
