@@ -5,7 +5,7 @@ accountId: ""
 
 # list of microservices to deploy
 services:
-  orders-services:
+  orders-service:
     enabled: true
     replicaCount: 2
     port: 3000
@@ -18,7 +18,7 @@ services:
         cpu: "512m"
 
 
-  products-services:
+  products-service:
     enabled: true
     replicaCount: 2
     port: 3000
@@ -31,7 +31,7 @@ services:
         cpu: "512m"
 
 
-  users-services:
+  users-service:
     enabled: true
     replicaCount: 2
     port: 3000
