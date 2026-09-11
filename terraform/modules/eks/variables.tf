@@ -38,3 +38,9 @@ variable "node_instance_type" {
   type        = string
   default     = "t3.medium"
 }
+
+variable "github_actions_role_arn" {
+  description = "ARN of the GitHub Actions role to grant deploy permission to EKS"
+  type        = string
+  default     = null
+}
