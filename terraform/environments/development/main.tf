@@ -13,9 +13,10 @@ module "ecr" {
 }
 
 module "eks" {
-  source             = "../../modules/eks"
-  environment        = "dev"
-  private_subnet_ids = module.vpc.private_subnet_ids
+  source                  = "../../modules/eks"
+  environment             = "dev"
+  private_subnet_ids      = module.vpc.private_subnet_ids
+  github_actions_role_arn = module.github_oidc.role_arn
 }
 
 module "github_oidc" {
