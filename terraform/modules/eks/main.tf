@@ -146,10 +146,10 @@ resource "aws_eks_access_entry" "github_actions" {
 }
 
 resource "aws_eks_access_policy_association" "github_actions" {
-  count           = var.github_actions_role_arn != null ? 1 : 0
-  cluster_name    = aws_eks_cluster.main.name 
-  policy_arn      = "arn:aws:iam::aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-  principal_arn   = var.github_actions_role_arn
+  count         = var.github_actions_role_arn != null ? 1 : 0
+  cluster_name  = aws_eks_cluster.main.name
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+  principal_arn = var.github_actions_role_arn
 
   access_scope {
     type = "cluster"
