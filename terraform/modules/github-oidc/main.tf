@@ -28,10 +28,10 @@ resource "aws_iam_role" "github_actions" {
                 Action = "sts:AssumeRoleWithWebIdentity"
                 Condition = {
                     StringEquals = {
-                        "token.actions.githubusercontent.com:sub" = "sts.amazonaws.com"
+                        "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
                     }
                     StringLike = {
-                        "token.actions.githubusercontent.com:aud" = "repo:robpalacios1@40041666/aws-devops-terraform-eks:environment:${var.environment}"
+                        "token.actions.githubusercontent.com:sub" = "repo:robpalacios1@40041666/aws-devops-terraform-eks:${var.environment}"
                     }
                 }
             }
@@ -73,6 +73,30 @@ resource "aws_iam_role_policy" "ecr_push" {
                     "ecr:InitiateLayerUpload",
                     "ecr:UploadLayerPart",
                     "ecr:CompleteLayerUpload"
+                ]
+                Resource = "*"
+            }
+        ]
+    })
+}
+
+# ====================================================================
+# 4. Permissions - Attach policy for IAM role for EKS access
+# ====================================================================
+
+resource "aws_iam_role_policy" "eks_describe" {
+    name = "${var.environment}-eks-describe-policy"
+    role = aws_iam_role.github_actions.id
+
+    policy = jsonencode({
+        Version = "2012-10-17"
+        Statement = [
+            {
+                Effect = "Allow"
+                Action = [
+                    "eks:DescribeCluster",
+                    "eks:ListClusters",
+                    "eks:ListNodegroups"
                 ]
                 Resource = "*"
             }
