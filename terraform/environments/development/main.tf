@@ -1,10 +1,25 @@
 provider "aws" {
-  region = var.aws_region
+  region = "us-east-1"
 }
 
 module "vpc" {
   source      = "../../modules/vpc"
-  environment = var.environment
-  aws_region  = var.aws_region
+  environment = "dev"
 }
-  
+
+module "ecr" {
+  source      = "../../modules/ecr"
+  environment = "dev"
+}
+
+module "eks" {
+  source                  = "../../modules/eks"
+  environment             = "dev"
+  private_subnet_ids      = module.vpc.private_subnet_ids
+  github_actions_role_arn = module.github_oidc.role_arn
+}
+
+module "github_oidc" {
+  source      = "../../modules/github-oidc"
+  environment = "dev"
+}
