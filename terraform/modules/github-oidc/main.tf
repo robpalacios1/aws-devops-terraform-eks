@@ -31,7 +31,7 @@ resource "aws_iam_role" "github_actions" {
                         "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
                     }
                     StringLike = {
-                        "token.actions.githubusercontent.com:sub" = "repo:robpalacios1@40041666/aws-devops-terraform-eks:${var.environment}"
+                        "token.actions.githubusercontent.com:sub" = "repo:robpalacios1@40041666/aws-devops-terraform-eks:*"
                     }
                 }
             }

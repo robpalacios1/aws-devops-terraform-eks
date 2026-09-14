@@ -39,6 +39,12 @@ variable "node_instance_type" {
   default     = "t3.medium"
 }
 
+variable "enable_github_actions" {
+  description = "Enable GitHub Actions access entry and policy association"
+  type        = bool
+  default     = true
+}
+
 variable "github_actions_role_arn" {
   description = "ARN of the GitHub Actions role to grant deploy permission to EKS"
   type        = string
