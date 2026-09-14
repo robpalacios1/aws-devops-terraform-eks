@@ -29,3 +29,24 @@ output "repository_names" {
   description = "the names of the ECR repositories"
   value       = module.ecr.repository_names
 }
+
+#EKS outputs
+output "eks_cluster_name" {
+  description = "the name of the EKS cluster"
+  value       = module.eks.cluster_name
+}
+
+output "cluster_endpoint" {
+  description = "the endpoint of the EKS cluster"
+  value       = module.eks.cluster_endpoint
+}
+
+output "eks_cluster_id" {
+  description = "the id of the EKS cluster"
+  value       = module.eks.cluster_id
+}
+
+output "configure_kubectl" {
+  description = "command to configure kubectl locally"
+  value       = "aws eks update-kubeconfig --name ${module.eks.cluster_name} --region ${var.aws_region}"
+}
