@@ -48,3 +48,12 @@ module "aws_load_balancer_controller" {
     module.eks
   ]
 }
+
+module "metrics-server" {
+  source      = "../../modules/metrics-server"
+  environment = "dev"
+
+  depends_on = [
+    module.eks
+  ]
+}
