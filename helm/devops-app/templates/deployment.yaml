@@ -23,7 +23,7 @@ spec:
           ports:
             - containerPort: {{ $serviceSpec.port }}
           resources:
-            {{- toYaml $serviceSpec.resources | nindent 12 -}}
+            {{- toYaml $serviceSpec.resources | nindent 12 }}
           livenessProbe:
             httpGet:
               path: /health
