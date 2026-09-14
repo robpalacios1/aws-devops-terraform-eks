@@ -54,10 +54,10 @@ jobs:
 
           - name: Deploy Helm Charts
             run: |
-              helm upgrade --install devops-app ./helm/devops-app\
-                --set accountId="${{ secrets.AWS_ACCOUNT_ID }}"\
-                --set awsRegion="${{ env.AWS_REGION }}"\
-                --set environment="dev"\
+              helm upgrade --install devops-app ./helm/devops-app \
+                --set accountId="${{ secrets.AWS_ACCOUNT_ID }}" \
+                --set awsRegion="${{ env.AWS_REGION }}" \
+                --set environment="dev"
                 
           
             

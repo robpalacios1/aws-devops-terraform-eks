@@ -11,15 +11,16 @@ metadata:
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
 spec:
   rules:
-    paths:
-        {{- range $serviceName, $serviceSpec := .Values.services}}
-        {{- if $serviceSpec.enabled}}
-        - path: /{{$serviceName}}
-          pathType: Prefix
-          backend:
-            service:
-              name: {{$serviceName}}
-              port:
-                number: 80
-        {{- end}}
-        {{- end}}
+    - http:
+        paths:
+            {{- range $serviceName, $serviceSpec := .Values.services}}
+            {{- if $serviceSpec.enabled}}
+            - path: /{{$serviceName}}
+              pathType: Prefix
+              backend:
+                service:
+                  name: {{$serviceName}}
+                  port:
+                    number: 80
+            {{- end}}
+            {{- end}}
