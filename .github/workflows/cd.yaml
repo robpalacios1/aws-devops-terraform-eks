@@ -1,0 +1,71 @@
+name: CD Pipeline
+
+on:
+    push:
+        branches:
+            - development
+            - staging
+            - master
+
+permissions:
+    id-token: write
+    contents: read
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        env:
+          AWS_REGION: us-east-1
+          ROLE_TO_ASSUME: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-role  
+          EKS_CLUSTER_NAME: dev-eks-cluster
+
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v4
+
+          - name: Configure AWS credentials
+            uses: aws-actions/configure-aws-credentials@v4
+            with:
+              role-to-assume: ${{ env.ROLE_TO_ASSUME }}
+              aws-region: ${{ env.AWS_REGION }}
+
+          - name: Login to Amazon ECR
+            id: login-ecr
+            uses: aws-actions/amazon-ecr-login@v2
+
+          - name: Build & Push Docker Image to ECR
+            env:
+              REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+            run: |
+              for SERVICE in orders-service products-service users-service; do
+                IMAGE_URI="$REGISTRY/dev-$SERVICE:${{ github.sha }}"
+                LATEST_URI="$REGISTRY/dev-$SERVICE:latest"
+
+
+                echo "Building $IMAGE_URI..."
+                docker build -t $IMAGE_URI -t $LATEST_URI .
+                docker push $IMAGE_URI
+                docker push $LATEST_URI
+              done
+
+          - name: Update Kubeconfig
+            run: |
+              aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+
+          - name: Deploy Helm Charts
+            run: |
+              helm upgrade --install devops-app ./helm/devops-app\
+                --set accountId="${{ secrets.AWS_ACCOUNT_ID }}"\
+                --set awsRegion="${{ env.AWS_REGION }}"\
+                --set environment="dev"\
+                
+          
+            
+
+          
+          
+
+          
+          
+        
+        

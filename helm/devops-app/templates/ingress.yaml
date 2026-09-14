@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.environment }}--main-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/healthcheck-path: /health
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+spec:
+  rules:
+    paths:
+        {{- range $serviceName, $serviceSpec := .Values.services}}
+        {{- if $serviceSpec.enabled}}
+        - path: /{{$serviceName}}
+          pathType: Prefix
+          backend:
+            service:
+              name: {{$serviceName}}
+              port:
+                number: 80
+        {{- end}}
+        {{- end}}
