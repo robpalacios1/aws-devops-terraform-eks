@@ -24,7 +24,7 @@ module "ecr" {
   environment = var.environment
 }
 
-data "aws_iam_role" "github_oidc" {
+data "aws_iam_role" "github_actions" {
     name = "github-actions-role"
 }
 
@@ -33,11 +33,6 @@ module "eks" {
   environment             = var.environment
   private_subnet_ids      = module.vpc.private_subnet_ids
   github_actions_role_arn = data.aws_iam_role.github_actions.arn
-}
-
-module "github_oidc" {
-  source      = "../../modules/github-oidc"
-  environment = var.environment
 }
 
 module "aws_load_balancer_controller" {

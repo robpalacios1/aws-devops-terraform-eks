@@ -4,7 +4,7 @@ on:
   push:
       branches:
           - development
-          - staging
+          - release
           - master
   workflow_dispatch:
 
@@ -40,11 +40,11 @@ jobs:
               echo "TF_WORKING_DIR=terraform/environments/production" >> $GITHUB_ENV
               echo "TF_VARS_FILE=production.tfvars" >> $GITHUB_ENV
               echo "EKS_CLUSTER_NAME=prod-eks-cluster" >> $GITHUB_ENV
-            elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
-              echo "ENV_NAME=staging" >> $GITHUB_ENV
-              echo "TF_WORKING_DIR=terraform/environments/staging" >> $GITHUB_ENV
-              echo "TF_VARS_FILE=staging.tfvars" >> $GITHUB_ENV
-              echo "EKS_CLUSTER_NAME=staging-eks-cluster" >> $GITHUB_ENV
+            elif [[ "${{ github.ref }}" == "refs/heads/release" ]]; then
+              echo "ENV_NAME=release" >> $GITHUB_ENV
+              echo "TF_WORKING_DIR=terraform/environments/release" >> $GITHUB_ENV
+              echo "TF_VARS_FILE=release.tfvars" >> $GITHUB_ENV
+              echo "EKS_CLUSTER_NAME=release-eks-cluster" >> $GITHUB_ENV
             else
               echo "ENV_NAME=dev" >> $GITHUB_ENV
               echo "TF_WORKING_DIR=terraform/environments/development" >> $GITHUB_ENV
