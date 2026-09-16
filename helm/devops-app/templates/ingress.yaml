@@ -13,6 +13,13 @@ spec:
   rules:
     - http:
         paths:
+            - path: /
+              pathType: Prefix
+              backend:
+                service:
+                  name: orders-service
+                  port:
+                    number: 80
             {{- range $serviceName, $serviceSpec := .Values.services}}
             {{- if $serviceSpec.enabled}}
             - path: /{{$serviceName}}
