@@ -69,7 +69,7 @@ jobs:
           run: |
             for SERVICE in orders-service products-service users-service; do
               IMAGE_URI="$REGISTRY/dev-$SERVICE:${{ github.sha }}"
-              LATEST_URI="$REGISTRY/dev-$SERVICE:${{ github.sha }}"
+              LATEST_URI="$REGISTRY/dev-$SERVICE:latest"
 
 
               echo "Building $IMAGE_URI..."
