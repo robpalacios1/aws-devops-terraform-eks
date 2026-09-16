@@ -33,6 +33,7 @@ resource "aws_iam_role" "github_actions" {
                     StringLike = {
                         "token.actions.githubusercontent.com:sub" = [
                             "repo:robpalacios1/aws-devops-terraform-eks:*",
+                            "repo:robpalacios1@40041666/aws-devops-terraform-eks@1346344326:*",
                             "repo:robpalacios1*/aws-devops-terraform-eks*:*"
                         ]
                     }
