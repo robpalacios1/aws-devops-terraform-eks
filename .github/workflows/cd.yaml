@@ -20,6 +20,8 @@ jobs:
         ROLE_TO_ASSUME: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-role  
         EKS_CLUSTER_NAME: dev-eks-cluster
         TF_WORKING_DIR: terraform/environments/development
+        TF_VARS_FILE: development.tfvars
+        ENV_NAME: dev
 
       steps:
         - name: Checkout code
@@ -30,6 +32,25 @@ jobs:
           with:
             role-to-assume: ${{ env.ROLE_TO_ASSUME }}
             aws-region: ${{ env.AWS_REGION }}
+
+        - name: Set Environment Variables
+          run: |
+            if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+              echo "ENV_NAME=prod" >> $GITHUB_ENV
+              echo "TF_WORKING_DIR=terraform/environments/production" >> $GITHUB_ENV
+              echo "TF_VARS_FILE=production.tfvars" >> $GITHUB_ENV
+              echo "EKS_CLUSTER_NAME=prod-eks-cluster" >> $GITHUB_ENV
+            elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+              echo "ENV_NAME=staging" >> $GITHUB_ENV
+              echo "TF_WORKING_DIR=terraform/environments/staging" >> $GITHUB_ENV
+              echo "TF_VARS_FILE=staging.tfvars" >> $GITHUB_ENV
+              echo "EKS_CLUSTER_NAME=staging-eks-cluster" >> $GITHUB_ENV
+            else
+              echo "ENV_NAME=dev" >> $GITHUB_ENV
+              echo "TF_WORKING_DIR=terraform/environments/development" >> $GITHUB_ENV
+              echo "TF_VARS_FILE=development.tfvars" >> $GITHUB_ENV
+              echo "EKS_CLUSTER_NAME=dev-eks-cluster" >> $GITHUB_ENV
+            fi
 
         # ------------------------------------------------------------------
         # 1. Terraform Setup & Apply en Development
@@ -42,18 +63,18 @@ jobs:
 
         - name: Terraform Init
           run: |
-            cd ${{env.TF_WORKING_DIR}} 
+            cd ${{ env.TF_WORKING_DIR }} 
             terraform init
 
         - name: Terraform Validate
           run: |
-            cd ${{env.TF_WORKING_DIR}} 
+            cd ${{ env.TF_WORKING_DIR }} 
             terraform validate
 
         - name: Terraform Apply
           run: |
-            cd ${{env.TF_WORKING_DIR}} 
-            terraform apply -var-file="development.tfvars" -auto-approve
+            cd ${{ env.TF_WORKING_DIR }} 
+            terraform apply -var-file="${{ env.TF_VARS_FILE }}" -auto-approve
 
         # ------------------------------------------------------------------
         # 2. Build & Push of images to ECR
@@ -68,8 +89,8 @@ jobs:
             REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           run: |
             for SERVICE in orders-service products-service users-service; do
-              IMAGE_URI="$REGISTRY/dev-$SERVICE:${{ github.sha }}"
-              LATEST_URI="$REGISTRY/dev-$SERVICE:latest"
+              IMAGE_URI="$REGISTRY/${{ env.ENV_NAME }}-$SERVICE:${{ github.sha }}"
+              LATEST_URI="$REGISTRY/${{ env.ENV_NAME }}-$SERVICE:latest"
 
 
               echo "Building $IMAGE_URI..."
@@ -91,4 +112,4 @@ jobs:
             helm upgrade --install devops-app ./helm/devops-app \
               --set accountId="${{ secrets.AWS_ACCOUNT_ID }}" \
               --set awsRegion="${{ env.AWS_REGION }}" \
-              --set environment="dev"
+              --set environment="${{ env.ENV_NAME }}"
