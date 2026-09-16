@@ -1,0 +1,20 @@
+{
+  "name": "devops-demo-app",
+  "version": "1.0.0",
+  "description": "Aplicacion web de demostracion para el proyecto DevOps (Terraform + EKS/EC2/CloudFront + GitHub Actions).",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "echo \"No tests specified\" && exit 0",
+    "build": "echo \"No build required\""
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "license": "MIT"
+}
