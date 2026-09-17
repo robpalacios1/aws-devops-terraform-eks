@@ -33,6 +33,7 @@ module "eks" {
   environment             = var.environment
   private_subnet_ids      = module.vpc.private_subnet_ids
   github_actions_role_arn = data.aws_iam_role.github_actions.arn
+  enable_github_actions   = false 
 }
 
 module "aws_load_balancer_controller" {
