@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DevOps Demo App</title>
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">
+        <span class="dot"></span>
+        <h1>DevOps Demo App</h1>
+      </div>
+      <span id="env-badge" class="badge badge--unknown">cargando...</span>
+    </header>
+
+    <main>
+      <section class="card hero">
+        <h2>¡Despliegue funcionando correctamente! 🚀</h2>
+        <p>
+          Esta aplicación se muestra cuando el proyecto se despliega en
+          <strong>EKS</strong>, <strong>EC2</strong> o detrás de <strong>CloudFront</strong>.
+          Los datos de abajo se leen en vivo desde el propio servidor, así que
+          confirman en qué ambiente y versión estás parado.
+        </p>
+      </section>
+
+      <section class="grid" id="info-grid">
+        <div class="card stat">
+          <span class="label">Ambiente</span>
+          <span class="value" id="v-env">—</span>
+        </div>
+        <div class="card stat">
+          <span class="label">Versión</span>
+          <span class="value" id="v-version">—</span>
+        </div>
+        <div class="card stat">
+          <span class="label">Git SHA</span>
+          <span class="value" id="v-sha">—</span>
+        </div>
+        <div class="card stat">
+          <span class="label">Hostname / Pod</span>
+          <span class="value" id="v-host">—</span>
+        </div>
+        <div class="card stat">
+          <span class="label">Región AWS</span>
+          <span class="value" id="v-region">—</span>
+        </div>
+        <div class="card stat">
+          <span class="label">Node.js</span>
+          <span class="value" id="v-node">—</span>
+        </div>
+        <div class="card stat">
+          <span class="label">Uptime</span>
+          <span class="value" id="v-uptime">—</span>
+        </div>
+        <div class="card stat">
+          <span class="label">Hora del servidor</span>
+          <span class="value" id="v-time">—</span>
+        </div>
+      </section>
+
+      <section class="card endpoints">
+        <h3>Endpoints disponibles</h3>
+        <ul>
+          <li><code>GET /</code> — esta página</li>
+          <li><code>GET /health</code> — liveness probe (para Kubernetes/EKS)</li>
+          <li><code>GET /ready</code> — readiness probe (para Kubernetes/EKS)</li>
+          <li><code>GET /api/info</code> — datos del ambiente en JSON</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer>
+      <p>Hecho para tu proyecto de DevOps · Terraform · EKS · EC2 · CloudFront · GitHub Actions</p>
+    </footer>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+name: CD Pipeline
+
+on:
+  push:
+      branches:
+          - development
+          - release
+          - master
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+      runs-on: ubuntu-latest
+      env:
+        AWS_REGION: us-east-1
+        ROLE_TO_ASSUME: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-role  
+        EKS_CLUSTER_NAME: dev-eks-cluster
+        TF_WORKING_DIR: terraform/environments/development
+        TF_VARS_FILE: development.tfvars
+        ENV_NAME: dev
+
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+
+        - name: Configure AWS credentials
+          uses: aws-actions/configure-aws-credentials@v4
+          with:
+            role-to-assume: ${{ env.ROLE_TO_ASSUME }}
+            aws-region: ${{ env.AWS_REGION }}
+
+        - name: Set Environment Variables
+          run: |
+            if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+              echo "ENV_NAME=prod" >> $GITHUB_ENV
+              echo "TF_WORKING_DIR=terraform/environments/production" >> $GITHUB_ENV
+              echo "TF_VARS_FILE=production.tfvars" >> $GITHUB_ENV
+              echo "EKS_CLUSTER_NAME=prod-eks-cluster" >> $GITHUB_ENV
+            elif [[ "${{ github.ref }}" == "refs/heads/release" ]]; then
+              echo "ENV_NAME=staging" >> $GITHUB_ENV
+              echo "TF_WORKING_DIR=terraform/environments/staging" >> $GITHUB_ENV
+              echo "TF_VARS_FILE=staging.tfvars" >> $GITHUB_ENV
+              echo "EKS_CLUSTER_NAME=staging-eks-cluster" >> $GITHUB_ENV
+            else
+              echo "ENV_NAME=dev" >> $GITHUB_ENV
+              echo "TF_WORKING_DIR=terraform/environments/development" >> $GITHUB_ENV
+              echo "TF_VARS_FILE=development.tfvars" >> $GITHUB_ENV
+              echo "EKS_CLUSTER_NAME=dev-eks-cluster" >> $GITHUB_ENV
+            fi
+
+        # ------------------------------------------------------------------
+        # 1. Terraform Setup & Apply en Development
+        # ------------------------------------------------------------------
+
+        - name: Setup Terraform
+          uses: hashicorp/setup-terraform@v3
+          with:
+            terraform_version: 1.9.5
+
+        - name: Terraform Init
+          run: |
+            cd ${{ env.TF_WORKING_DIR }} 
+            terraform init
+
+        - name: Terraform Validate
+          run: |
+            cd ${{ env.TF_WORKING_DIR }} 
+            terraform validate
+
+        - name: Terraform Apply
+          run: |
+            cd ${{ env.TF_WORKING_DIR }} 
+            terraform apply -var-file="${{ env.TF_VARS_FILE }}" -auto-approve
+
+        # ------------------------------------------------------------------
+        # 2. Build & Push of images to ECR
+        # ------------------------------------------------------------------
+
+        - name: Login to Amazon ECR
+          id: login-ecr
+          uses: aws-actions/amazon-ecr-login@v2
+
+        - name: Build & Push Docker Image to ECR
+          env:
+            REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          run: |
+            for SERVICE in orders-service products-service users-service; do
+              IMAGE_URI="$REGISTRY/${{ env.ENV_NAME }}-$SERVICE:${{ github.sha }}"
+              LATEST_URI="$REGISTRY/${{ env.ENV_NAME }}-$SERVICE:${{ github.sha }}"
+
+
+              echo "Building $IMAGE_URI..."
+              docker build -t $IMAGE_URI -t $LATEST_URI .
+              docker push $IMAGE_URI
+              docker push $LATEST_URI
+            done
+
+        # ------------------------------------------------------------------
+        # 3. Update kubeconfig & Deploy with Helm
+        # ------------------------------------------------------------------
+
+        - name: Update Kubeconfig
+          run: |
+            aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+
+        - name: Deploy Helm Charts
+          run: |
+            helm upgrade --install devops-app ./helm/devops-app \
+              --set accountId="${{ secrets.AWS_ACCOUNT_ID }}" \
+              --set awsRegion="${{ env.AWS_REGION }}" \
+              --set environment="${{ env.ENV_NAME }}"
