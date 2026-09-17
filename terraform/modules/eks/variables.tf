@@ -39,6 +39,12 @@ variable "node_instance_type" {
   default     = "t3.medium"
 }
 
+variable "create_access_entry" {
+  description = "Whether to create the access entry resource"
+  type        = bool
+  default     = true
+}
+
 variable "enable_github_actions" {
   description = "Enable GitHub Actions access entry and policy association"
   type        = bool
